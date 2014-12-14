@@ -1,0 +1,11 @@
+{
+  "name": "fibre",
+  "version": "0.1.0",
+  "description": "Searches in DOM text and replace/wrap the targets.",
+  "main": "src/fibre.js",
+  "scripts": {
+    "test": ""
+  },
+  "author": "Chen Yijun (@ethantw)",
+  "license": "MIT License"
+}
