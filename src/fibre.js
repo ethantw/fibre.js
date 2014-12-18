@@ -1,7 +1,7 @@
-
-var VERSION = '0.1.0'
-var FILTER_OUT_SELECTOR = 'style, script, title'
 var Finder = Finder || require( './fardt.module' )
+
+var VERSION = '@VERSION'
+var FILTER_OUT_SELECTOR = 'style, script, head title'
 
 var global = window || {}
 var document = global.document || undefined
@@ -17,11 +17,10 @@ function matches( node, selector ) {
   }
 }
 
-if ( typeof document === 'undefined' )
-  throw new Error( 'Fibre requires an environment with support of DOM.' )
+if ( typeof document === 'undefined' )  throw new Error( 'Fibre requires a DOM-supported environment.' )
 
 var Fibre = function( context ) {
-  return Fibre.fn.init( context )
+  return new Fibre.fn.init( context )
 }
 
 Fibre.version = VERSION
@@ -43,13 +42,20 @@ Fibre.fn = Fibre.prototype = {
   },
 
   filterOut: function( selector, notToOverride ) {
-    if ( typeof selector === 'string' ) {
-      if ( typeof notToOverride !== 'undefined' && notToOverride === true )
-        this.filterOutSelector += selector
-      else
-        this.filterOutSelector = selector
-    } else if ( typeof selector === 'function' )
-      this.filterOutFn = selector
+    switch( typeof selector ) {
+      case 'string':
+        if ( typeof notToOverride !== 'undefined' && notToOverride === true ) {
+          this.filterOutSelector += selector
+        } else {
+          this.filterOutSelector = selector
+        }
+        break
+      case 'function':
+        this.filterOutFn = selector
+        break
+      default:
+        return this
+    }
     return this
   },
 
@@ -59,20 +65,24 @@ Fibre.fn = Fibre.prototype = {
     return this
   },
 
-  replace: function( regexp, newSubStr ) {
+  replace: function( regexp, newSubStr, portionMode ) {
+    var portionMode = portionMode || 'retain'
     this.finder.push(Finder( this.context, {
       find: regexp, 
       replace: newSubStr,
-      filterElements: this.filterOutFn  
+      filterElements: this.filterOutFn,
+      portionMode: portionMode
     }))
     return this
   },
 
-  wrap: function( regexp, newDOMObj ) {
+  wrap: function( regexp, newDOMObj, portionMode ) {
+    var portionMode = portionMode || 'retain'
     this.finder.push(Finder( this.context, {
       find: regexp, 
       wrap: newDOMObj,
-      filterElements: this.filterOutFn  
+      filterElements: this.filterOutFn,
+      portionMode: portionMode
     }))
     return this
   },
@@ -94,3 +104,12 @@ Fibre.fn = Fibre.prototype = {
 
 Fibre.fn.init.prototype = Fibre.fn
 
+// EXPOSE
+if ( typeof define === 'function' && define.amd ) {
+  define(function() {  return Fibre  })
+} else if ( typeof module === 'object' && typeof module.exports === 'object' ) {
+  module.exports = Fibre 
+} else {
+  global.Fibre = Fibre
+}
+// EXPOSE

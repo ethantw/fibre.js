@@ -1,5 +1,4 @@
 
-void function( undefined ) {
+(function( Finder ) {
 
-  'use strict';
-
+  'use strict'

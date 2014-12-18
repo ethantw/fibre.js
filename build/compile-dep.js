@@ -1,5 +1,5 @@
 
-'use strict';
+'use strict'
 
 var fs = require( 'fs' )
 
@@ -13,7 +13,13 @@ var src = fs.readFileSync( fardt )
 var src_module = src 
 
 src = src.toString()
-  .replace( 'window.findAndReplaceDOMText =', 'var Finder =' )
+  .replace( 'window.findAndReplaceDOMText =', '' )
+  .replace( /;(\s+)?\n/g, '\n' )
+  .replace( /;$/, ''  )
+  .replace( /\n(\t+)/g, function( match, tab ) {
+    var tab = tab.replace( /\t/g, '  ' )
+    return '\n' + tab
+  })
 
 fs.writeFile(
   build,
@@ -34,3 +40,4 @@ fs.writeFile(
     if ( err )  console.log( err )
   }
 )
+
