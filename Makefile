@@ -10,8 +10,5 @@ fardt.js ::
 	node build/compile-dep.js
 
 dist ::
-	make fardt.js
-	rm -rf dist
-	mkdir dist
-	cd src && cat intro.js fardt.js fibre.js outro.js > ../dist/fibre.js
+	gulp build
 
