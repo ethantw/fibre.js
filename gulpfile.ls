@@ -2,9 +2,15 @@
 require! <[ gulp ]>
 connect = require \gulp-connect
 concat = require \gulp-concat-util
+lsc = require \gulp-livescript
+browserify = require \gulp-browserify
+jade = require \gulp-jade
+watch = require \gulp-watch
 pkg = require \./package.json
 
 const VERSION = pkg.version
+
+src = -> gulp.src( it ).pipe( watch( it ))
 
 gulp.task \server !->
   connect.server {
@@ -26,7 +32,16 @@ gulp.task \build !->
       """
     .pipe gulp.dest \./dist/
 
-gulp.task \watch !->
+gulp.task \test !->
+  src \test/src/main.ls
+    .pipe lsc!
+    .pipe browserify!
+    .pipe gulp.dest \./test/
+  src \test/*.jade
+    .pipe jade { +pretty }
+    .pipe gulp.dest \./test/
+
+gulp.task \watch <[ test ]> !->
   gulp.watch \src/*.js <[ build ]>
 
 gulp.task \default <[ server build watch ]>
