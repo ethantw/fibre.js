@@ -75,31 +75,37 @@ Fibre.fn = Fibre.prototype = {
   },
 
   replace: function( regexp, newSubStr, portionMode ) {
+    var it = this
     var portionMode = portionMode || 'retain'
-    this.finder.push(Finder( this.context, {
+    it.finder.push(Finder( it.context, {
       find: regexp, 
       replace: newSubStr,
-      filterElements: this.filterOutFn,
+      filterElements: function( currentNode ) {
+        return it.filterOutFn( currentNode )
+      }, 
       portionMode: portionMode
     }))
-    return this
+    return it 
   },
 
   wrap: function( regexp, newDOMObj, portionMode ) {
+    var it = this
     var portionMode = portionMode || 'retain'
-    this.finder.push(Finder( this.context, {
+    it.finder.push(Finder( it.context, {
       find: regexp, 
       wrap: newDOMObj,
-      filterElements: this.filterOutFn,
+      filterElements: function( currentNode ) {
+        return it.filterOutFn( currentNode )
+      }, 
       portionMode: portionMode
     }))
-    return this
+    return it
   },
 
   revert: function( level ) {
     var max = this.finder.length        
-    var level = Number( level ) || level === 0 ? Number(0) :
-      level === 'all' ? max : 1
+    var level = Number( level ) || ( level === 0 ? Number(0) :
+      ( level === 'all' ? max : 1 ))
 
     if ( typeof max === 'undefined' || max === 0 )  return this
     else if ( level > max )  level = max
