@@ -6,15 +6,16 @@ var FILTER_OUT_SELECTOR = 'style, script, head title'
 var global = window || {}
 var document = global.document || undefined
 
-function matches( node, selector ) {
+function matches( node, selector, make39True ) {
   var Efn = Element.prototype
   var matches = Efn.matches || Efn.mozMatchesSelector || Efn.msMatchesSelector || Efn.webkitMatchesSelector
   
-  try {
-    return matches.call( node, selector )
-  } catch (e) {
-    return false
+  if ( node instanceof Element ) {
+    return matches.call( node, selector ) 
+  } else if ( make39True && /^[39]$/.test( node.nodeType )) {
+    return true
   }
+  return false
 }
 
 if ( typeof document === 'undefined' )  throw new Error( 'Fibre requires a DOM-supported environment.' )
@@ -34,24 +35,27 @@ Fibre.fn = Fibre.prototype = {
 
   finder: [],
 
-  filterOutSelector: FILTER_OUT_SELECTOR,
+  init: function( context ) {
+    if ( !context )  throw new Error( 'A context is required for Fibre to initialise.' ) 
 
-  filterOutFn: function( currentNode ) {
-    if ( matches( currentNode, this.filterOutSelector ))  return false
-    return true
+    this.context = context 
+    return this
   },
 
-  filterOut: function( selector, notToOverride ) {
-    switch( typeof selector ) {
+  filterElemFn: function( currentNode ) {
+    return matches( currentNode, this.filterSelector, true ) &&
+      !matches( currentNode, this.filterOutSelector )
+  },
+
+  filterSelector: '*',
+
+  filter: function( selector ) {
+    switch ( typeof selector ) {
       case 'string':
-        if ( typeof notToOverride !== 'undefined' && notToOverride === true ) {
-          this.filterOutSelector += selector
-        } else {
-          this.filterOutSelector = selector
-        }
+        this.filterSelector = selector
         break
       case 'function':
-        this.filterOutFn = selector
+        this.filterElemFn = selector
         break
       default:
         return this
@@ -59,9 +63,20 @@ Fibre.fn = Fibre.prototype = {
     return this
   },
 
-  init: function( context ) {
-    if ( !context )  throw new Error( 'A context is required for Fibre to initialise.' ) 
-    this.context = context 
+  filterOutSelector: FILTER_OUT_SELECTOR,
+
+  filterOut: function( selector, boolAppend ) {
+    switch( typeof selector ) {
+      case 'string':
+        if ( typeof boolAppend !== 'undefined' && boolAppend === true ) {
+          this.filterOutSelector += selector
+        } else {
+          this.filterOutSelector = selector
+        }
+        break
+      default:
+        return this
+    }
     return this
   },
 
@@ -72,23 +87,22 @@ Fibre.fn = Fibre.prototype = {
       find: regexp, 
       replace: newSubStr,
       filterElements: function( currentNode ) {
-        return it.filterOutFn( currentNode )
+        return it.filterElemFn( currentNode )
       }, 
       portionMode: portionMode
     }))
     return it 
   },
 
-  wrap: function( regexp, newDOMObj, portionMode ) {
+  wrap: function( regexp, strElemName ) {
     var it = this
     var portionMode = portionMode || 'retain'
     it.finder.push(Finder( it.context, {
       find: regexp, 
-      wrap: newDOMObj,
+      wrap: strElemName,
       filterElements: function( currentNode ) {
-        return it.filterOutFn( currentNode )
-      }, 
-      portionMode: portionMode
+        return it.filterElemFn( currentNode )
+      }
     }))
     return it
   },
