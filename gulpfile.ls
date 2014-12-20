@@ -33,7 +33,7 @@ gulp.task \build !->
     .pipe gulp.dest \./dist/
 
 gulp.task \test !->
-  src \test/src/main.ls
+  src \test/main.ls
     .pipe lsc!
     .pipe browserify!
     .pipe gulp.dest \./test/
