@@ -1,8 +1,8 @@
 
 # Fibre.js
-Fibre.js is a small library based on [`FindAndReplaceDOMText`][fardt] by [James Padolsey][jp], with extra syntax sugar.
+Fibre.js is a small library based on [`FindAndReplaceDOMText`][fardt] by [James Padolsey][jp].
 
-It searches for the regular expression matches in a given context (a DOM node) and replaces/wraps each one of them with a new text run or a new DOM node. 
+The methods provided by Fibre can search for the regular expression matches in a given context (a DOM node) and replaces/wraps each one of them with a new text run or a new DOM node. 
 
 *Chaining & string-like syntax supported.*
 
@@ -34,7 +34,7 @@ fibre
 ```
 
 ## Fibre.fn.wrap()
-The `wrap()` method wraps an assigned node round the matched text in the given context.
+The method wraps an assigned node round the matched text in the given context.
 
 ### Syntax
 ```javascript
@@ -89,7 +89,7 @@ Results in:
 ```
 
 ## Fibre.fn.replace()
-The `replace()` method replaces the matched text in the given context with a new string.
+The method replaces the matched text in the given context with a new string.
 
 ### Syntax
 ```javascript
@@ -118,7 +118,7 @@ fibre.replace( regexp|substr, newSubStr|function[, portionMode] )
 ### Examples 
 ```html
 <article>
-  <p>
+  <p>Th<span>is</span> paragraph is to be later replaced.</p>
 </article>
 ```
 
@@ -130,15 +130,22 @@ var fibre = Fibre( document.querySelector( 'article' ))
 var fibre = Fibre( $( 'article' )[0] )
 
 fibre
-  .replace( /体/g, '體' )
-  .replace( //g, function( portion, match ) {
-  
+  .replace( /(\w+)/g, '*$1' )
+  .replace( /\*this/ig, function( portion, match ) {
+    return portion.index + match.toUpperCase()  
   })
+```
 
+Will result in:
+
+```html
+<article>
+  <p>*TH<span>IS</span> *paragraph *is *to *be *later *replaced.</p>
+</article>
 ```
 
 ## Fibre.fn.filter()
-The `filter()` method decides nodes that *will* later apply the wrap/replace method.
+The method filters the nodes in the given context and decides whether the nodes *will* later apply the wrap/replace method.
 
 ### Syntax
 ```javascript
@@ -155,9 +162,38 @@ fibre.filter( selector|function )
 </dl>
 
 ### Examples
+```html
+<div id="test">
+  <p>This <span class="be">is</span> a simple test.</p>
+</div>
+
+<script>
+ var test = 'This is a simple test.' 
+</script>
+```
+
+```javascript
+Fibre( document.getElementById( 'test' ))
+  .wrap( /is/gi, 'b' )
+  .filter( '.be' )
+  .wrap( /is/gi, 'em' ) 
+```
+
+Will result in:
+
+```html
+<div id="test">
+  <p>Th<b>is</b> <span class="be"><b><em>is</em></b></span> a simple test.</p>
+</div>
+
+<script>
+ var test = 'This is a simple test.' 
+</script>
+```
+**Note:** The matched text inside `script` element isn't altered for Fibre defaultly filters out `script`, `style` and `head title` elements. Reset the default filter-out selectors via `Fibre.fn.filterOut`.
 
 ## Fibre.fn.filterOut()
-The `filterOut()` method decides nodes that will later *not* apply the wrap/replace method.
+The method filters *out* the nodes in the given context and decides whether the nodes *will* later apply the wrap/replace method.
 
 ### Syntax
 ```javascript
@@ -173,17 +209,60 @@ fibre.filterOut( selector, boolExtend )
 <dd>Optional. A boolean indicating whether to extend the current selector (<code>true</code>, <code>style, script, head title</code> from the prototype object) or to override the selector entirely (<code>false</code>). Defaultly <code>false</code>.
 </dl>
 
+### Examples
+```html
+<div id="test">
+  <p>This <span class="be">is</span> a simple test.</p>
+</div>
+
+<script>
+ var test = 'This is a simple test.' 
+</script>
+```
+
+```javascript
+Fibre( document.getElementById( 'test' ))
+  .wrap( /is/gi, 'span' )
+  .filterOut( '.be' )
+  .replace( /is/gi, 'IZZ' ) 
+```
+
+Will result in:
+```html
+<div id="test">
+  <p>Th<b>IZZ</b> <span class="be"><b>is</b></span> a simple test.</p>
+</div>
+
+<script>
+ var test = 'ThIZZ IZZ a simple test.' 
+</script>
+```
+
 ## Fibre.fn.revert()
-The `revert()` method reverts the finder with a given level.
+The method reverts the finder by a given level.
 
 ### Syntax
 ```javascript
 fibre.revert( [level] )
 ```
 
-### Parametre
+### Parametres
 <dl>
 <dt><code>level</code>
 <dd>Optional. A Number or a String whose value is <code>'all'</code> indicating the finder level to revert. The default value is <code>1</code>.
 </dl>
+
+### Examples
+```javascript
+var fibre = Fibre( document.getElementById( 'test' ))
+  .replace( //gi, '' )
+  .wrap( //g, 'span' )
+
+// Later,
+fibre.revert( 'all' )
+```
+
+#### Description
+The last line of the script above will revert the context (`document.getElementById( 'test' )`) back to the state before any replace or wrap method has executed.
+
 
