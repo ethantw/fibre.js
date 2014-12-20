@@ -161,7 +161,7 @@ The `filterOut()` method decides nodes that will later *not* apply the wrap/repl
 
 ### Syntax
 ```javascript
-fibre.filterOut( selector, boolAppend )
+fibre.filterOut( selector, boolExtend )
 ```
 
 ### Parametres
@@ -169,7 +169,7 @@ fibre.filterOut( selector, boolAppend )
 <dt><code>selector</code>
 <dd>A String containing one or more CSS selector(s) to filter <em>out</em> the matched nodes while traversing.
 
-<dt><code>boolAppend</code>
+<dt><code>boolExtend</code>
 <dd>Optional. A boolean indicating whether to extend the current selector (<code>true</code>, <code>style, script, head title</code> from the prototype object) or to override the selector entirely (<code>false</code>). Defaultly <code>false</code>.
 </dl>
 

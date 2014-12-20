@@ -15,13 +15,13 @@ var FILTER_OUT_SELECTOR = 'style, script, head title'
 var global = window || {}
 var document = global.document || undefined
 
-function matches( node, selector, make39True ) {
+function matches( node, selector, bypassNodeType39 ) {
   var Efn = Element.prototype
   var matches = Efn.matches || Efn.mozMatchesSelector || Efn.msMatchesSelector || Efn.webkitMatchesSelector
   
   if ( node instanceof Element ) {
     return matches.call( node, selector ) 
-  } else if ( make39True && /^[39]$/.test( node.nodeType )) {
+  } else if ( bypassNodeType39 && /^[39]$/.test( node.nodeType )) {
     return true
   }
   return false
@@ -74,10 +74,10 @@ Fibre.fn = Fibre.prototype = {
 
   filterOutSelector: FILTER_OUT_SELECTOR,
 
-  filterOut: function( selector, boolAppend ) {
+  filterOut: function( selector, boolExtend ) {
     switch( typeof selector ) {
       case 'string':
-        if ( typeof boolAppend !== 'undefined' && boolAppend === true ) {
+        if ( typeof boolExtend !== 'undefined' && boolExtend === true ) {
           this.filterOutSelector += selector
         } else {
           this.filterOutSelector = selector
