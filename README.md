@@ -20,6 +20,13 @@ Fibre.js works on all *modern* browsers with no legacy support for older IE.
 Fibre.js is licensed under MIT License.
 
 # API
+- [Introduction](#introduction)
+- [Fibre.fn.wrap()](#fibrefnwrap)
+- [Fibre.fn.replace()](#fibrefnreplace)
+- [Fibre.fn.filter()](#fibrefnfilter)
+- [Fibre.fn.filterOut()](#fibrefnfilterout)
+- [Fibre.fn.revert()](#fibrefnrevert)
+
 ## Introduction 
 The syntax is *as simple as jQuery!*
 
@@ -32,7 +39,6 @@ fibre
 .doSth( … )
 .doSthElse( … )
 ```
-
 ## Fibre.fn.wrap()
 The method wraps an assigned node round the matched text in the given context.
 
@@ -256,8 +262,8 @@ fibre.revert( [level] )
 ### Examples
 ```javascript
 var fibre = Fibre( document.getElementById( 'test' ))
-  .replace( //gi, '' )
-  .wrap( //g, 'span' )
+  .replace( /\bis\b/gi, 'isn\'t' )
+  .wrap( /\bwill\b/gi, 'span' )
 
 // Later,
 fibre.revert( 'all' )
