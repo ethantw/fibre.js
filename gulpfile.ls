@@ -19,7 +19,7 @@ gulp.task \server !->
   }
 
 gulp.task \build !->
-  gulp.src <[ src/intro.js src/fibre.js src/expose.js src/fardt.js src/outro.js ]>
+  gulp.src <[ src/intro.js src/fibre.js src/post-expose.js src/fardt.js src/outro.js ]>
     .pipe concat \fibre.js {
       process: ( src ) ->
         src.replace /@VERSION/, VERSION 
