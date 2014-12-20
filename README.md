@@ -132,7 +132,8 @@ var fibre = Fibre( $( 'article' )[0] )
 fibre
   .replace( /(\w+)/g, '*$1' )
   .replace( /\*this/ig, function( portion, match ) {
-    return portion.index + match.toUpperCase()  
+    var idx = portion.index
+    return idx + match[ idx ].toUpperCase()  
   })
 ```
 
@@ -206,7 +207,7 @@ fibre.filterOut( selector, boolExtend )
 <dd>A String containing one or more CSS selector(s) to filter <em>out</em> the matched nodes while traversing.
 
 <dt><code>boolExtend</code>
-<dd>Optional. A boolean indicating whether to extend the current selector (<code>true</code>, <code>style, script, head title</code> from the prototype object) or to override the selector entirely (<code>false</code>). Defaultly <code>false</code>.
+<dd><em>Optional.</em> A boolean indicating whether to extend the current selector (<code>true</code>, <code>style, script, head title</code> from the prototype object) or to override the selector entirely (<code>false</code>). Defaultly <code>false</code>.
 </dl>
 
 ### Examples
@@ -249,7 +250,7 @@ fibre.revert( [level] )
 ### Parametres
 <dl>
 <dt><code>level</code>
-<dd>Optional. A Number or a String whose value is <code>'all'</code> indicating the finder level to revert. The default value is <code>1</code>.
+<dd><em>Optional.</em> A Number or a String whose value is <code>'all'</code> indicating the finder level to revert. The default value is <code>1</code>.
 </dl>
 
 ### Examples
