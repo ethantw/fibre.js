@@ -3,7 +3,7 @@
  * Based on findAndReplaceDOMText
  */
 
-(function( Finder ) {
+void function( Finder ) {
 
 'use strict'
 
@@ -152,7 +152,7 @@ if ( typeof define === 'function' && define.amd ) {
 }
 // EXPOSE
 
-})(
+}(
 
 /**
  * findAndReplaceDOMText v 0.4.2

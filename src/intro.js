@@ -1,2 +1,2 @@
 
-(function( Finder ) {
+void function( Finder ) {
