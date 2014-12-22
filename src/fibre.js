@@ -8,13 +8,13 @@ var FILTER_OUT_SELECTOR = 'style, script, head title'
 var global = window || {}
 var document = global.document || undefined
 
-function matches( node, selector, bypassNodeType39 ) {
+function matches( node, selector, boolBypassRegNode ) {
   var Efn = Element.prototype
   var matches = Efn.matches || Efn.mozMatchesSelector || Efn.msMatchesSelector || Efn.webkitMatchesSelector
   
   if ( node instanceof Element ) {
     return matches.call( node, selector ) 
-  } else if ( bypassNodeType39 && /^[39]$/.test( node.nodeType )) {
+  } else if ( boolBypassRegNode && node instanceof Node ) {
     return true
   }
   return false
@@ -33,14 +33,23 @@ Fibre.fn = Fibre.prototype = {
 
   version: VERSION,
 
-  context: null,  
+  context: undefined,
+
+  contextSelector: null,
 
   finder: [],
 
   init: function( context ) {
     if ( !context )  throw new Error( 'A context is required for Fibre to initialise.' ) 
 
-    this.context = context 
+    if ( context instanceof Node ) {
+      this.context = context
+    } else if ( typeof context === 'string' ) {
+      this.contextSelector = context
+      this.context = document.querySelector( context )
+      return this
+    }
+
     return this
   },
 

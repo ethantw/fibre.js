@@ -2,7 +2,7 @@
 # Fibre.js
 Fibre.js is a small library based on [`FindAndReplaceDOMText`][fardt] by [James Padolsey][jp].
 
-The methods provided by Fibre can search for the regular expression matches in a given context (a DOM node) and replaces/wraps each one of them with a new text run or a new DOM node. 
+The methods provided by Fibre search for the regular expression matches in a given context (a DOM node) and replaces/wraps each one of them with a new text run or a new DOM node. 
 
 *Chaining & string-like syntax supported.*
 
@@ -13,11 +13,34 @@ The methods provided by Fibre can search for the regular expression matches in a
 - NPM `npm i fibre.js --save`
 - Bower `bower install git://github.com/ethantw/fibre.js`
 
+### Require the library
+Use the `script` element,
+```html
+<script src="vendor/fibre.js/fibre.js"></script>
+```
+
+AMD,
+```javascript
+require( './node_modules/fibre.js/src/fibre', function( Fibre ) {
+  var fibre = Fibre( document.body )
+  …
+})
+```
+
+CommonJS (NPM),
+```javascript
+var Fibre = require( 'fibre.js' )
+var fibre = Fibre( document.body )
+…
+```
+
 ## Browser support
 Fibre.js works on all *modern* browsers with no legacy support for older IE.
 
 ## License
-Fibre.js is licensed under MIT License.
+Fibre.js is released under MIT License.
+
+* * *
 
 # API
 - [Introduction](#introduction)
@@ -32,13 +55,27 @@ The syntax is *as simple as jQuery!*
 
 `Fibre` needs no `new` operator to create an instance. Assign *one* DOM node to the first parametre `context` to initialise. 
 
+### Syntax
 ```javascript
 var fibre = Fibre( context )
 
 fibre
-.doSth( … )
-.doSthElse( … )
+  .replace( … )
+  .wrap( … )
 ```
+
+### Examples
+```javascript
+// Regular DOM node
+Fibre( document.body )
+// Document node
+Fibre( document )
+// jQuery object
+Fibre( $( '.container article' )[0] )
+// CSS selector (will only affect the first matched node)
+Fibre( '.container article' )
+```
+
 ## Fibre.fn.wrap()
 The method wraps an assigned node round the matched text in the given context.
 
@@ -129,11 +166,7 @@ fibre.replace( regexp|substr, newSubStr|function[, portionMode] )
 ```
 
 ```javascript
-// Native API
-var fibre = Fibre( document.querySelector( 'article' ))
-
-// Or, use jQuery
-var fibre = Fibre( $( 'article' )[0] )
+var fibre = Fibre( 'article' )
 
 fibre
   .replace( /(\w+)/g, '*$1' )
