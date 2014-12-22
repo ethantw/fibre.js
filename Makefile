@@ -6,15 +6,15 @@ dep ::
 	rm -rf ./findAndReplaceDOMText
 	git clone --depth 1 https://github.com/padolsey/findAndReplaceDOMText.git
 
-fardt.js ::
-	node build/compile-dep.js
-
 qunit ::
 	# ln node_modules/qunitjs/qunit/qunit.js test/qunit.js
 	ln node_modules/qunitjs/qunit/qunit.css test/qunit.css
 
+finder.js ::
+	gulp dep
+
 test/js ::
-	browserify test/test.js -o test/main.js
+	gulp watch
 
 dist ::
 	gulp build

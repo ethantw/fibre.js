@@ -1,4 +1,6 @@
-var Finder = Finder || require( './fardt.module' )
+'use strict'
+
+var Finder = Finder || require( './finder.umd' )
 
 var VERSION = '@VERSION'
 var FILTER_OUT_SELECTOR = 'style, script, head title'

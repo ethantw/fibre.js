@@ -1,4 +1,2 @@
 
 (function( Finder ) {
-
-  'use strict'
