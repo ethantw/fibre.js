@@ -54,7 +54,6 @@ Fibre.fn = Fibre.prototype = {
     } else if ( typeof context === 'string' ) {
       this.contextSelector = context
       this.context = document.querySelector( context )
-      return this
     }
 
     return this
