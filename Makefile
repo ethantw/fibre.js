@@ -17,5 +17,7 @@ test/js ::
 	gulp watch
 
 dist ::
+	make dep
+	make finder.js
 	gulp build
 

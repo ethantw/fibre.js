@@ -8,14 +8,14 @@ var FILTER_OUT_SELECTOR = 'style, script, head title'
 var global = window || {}
 var document = global.document || undefined
 
-function matches( node, selector, boolBypassRegNode ) {
+function matches( node, selector, bypassNodeType39 ) {
   var Efn = Element.prototype
   var matches = Efn.matches || Efn.mozMatchesSelector || Efn.msMatchesSelector || Efn.webkitMatchesSelector
   
   if ( node instanceof Element ) {
     return matches.call( node, selector ) 
-  } else if ( boolBypassRegNode && node instanceof Node ) {
-    return true
+  } else if ( bypassNodeType39 ) {
+    if ( /^[39]$/.test( node.nodeType ))  return true
   }
   return false
 }
@@ -27,6 +27,7 @@ var Fibre = function( context ) {
 }
 
 Fibre.version = VERSION
+Fibre.matches = matches
 
 Fibre.fn = Fibre.prototype = {
   constructor: Fibre,

@@ -49,6 +49,7 @@ Fibre.js is released under MIT License.
 - [Fibre.fn.filter()](#fibrefnfilter)
 - [Fibre.fn.filterOut()](#fibrefnfilterout)
 - [Fibre.fn.revert()](#fibrefnrevert)
+- [Fibre.matches()](#fibrematches)
 
 ## Introduction 
 The syntax is *as simple as jQuery!*
@@ -305,4 +306,40 @@ fibre.revert( 'all' )
 #### Description
 The last line of the script above will revert the context (`document.getElementById( 'test' )`) back to the state before any replace or wrap method has executed.
 
+## Fibre.matches()
+The method compares and returns whether a given node matches the given CSS selectors.
+
+### Syntax
+```javascript 
+Fibre.matches( node, selector, bypassNodeType39 )
+```
+
+<dl>
+<dt><code>node</code>
+<dd>A node object to compare. 
+
+<dt><code>selector</code>
+<dd>A string of CSS selectors to see if the node matches.
+
+<dt><code>bypassNodeType39</code>
+<dd><em>Optional.</em> A boolean that decides whether to always return `true` for Document or Text nodes.
+</dl>
+
+### Examples
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+  </head>
+  <body class="post">
+  </body>
+</html>
+```
+
+```javascript 
+Fibre.matches( document.body, 'body.index, body.post' )  // returns true
+Fibre.matches( document.documentElement, '[lang="es"]' ) // returns false 
+Fibre.matches( document, 'style' )                       // returns false
+Fibre.matches( document, 'style', true )                 // returns true
+```
 

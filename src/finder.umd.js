@@ -514,6 +514,8 @@ void (function() {
 
 	};
 
-	return exposed;
+// EXPOSE
+if (typeof define==='function'&&define.amd){define(function(){return exposed});}else if(typeof module!=='undefined'&&module.exports){module.exports=exposed;}else{window.findAndReplaceDOMText = exposed;}
+// EXPOSE
 
 }());
