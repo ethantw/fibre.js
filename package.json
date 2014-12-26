@@ -1,10 +1,9 @@
 {
   "name": "fibre.js",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "String-like DOM text manipulator",
   "main": "src/fibre.js",
   "scripts": {
-    "postinstall": "make dist",
     "test": "gulp test"
   },
   "author": "Chen Yijun (@ethantw)",
