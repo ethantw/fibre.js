@@ -319,7 +319,7 @@ Fibre.matches( node, selector, bypassNodeType39 )
 <dd>A node object to compare. 
 
 <dt><code>selector</code>
-<dd>A string of CSS selectors to see if the node matches.
+<dd>A string of CSS selectors to check if the node matches.
 
 <dt><code>bypassNodeType39</code>
 <dd><em>Optional.</em> A boolean that decides whether to always return `true` for Document or Text nodes.

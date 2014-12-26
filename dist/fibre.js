@@ -87,7 +87,7 @@ Fibre.fn = Fibre.prototype = {
     switch( typeof selector ) {
       case 'string':
         if ( typeof boolExtend !== 'undefined' && boolExtend === true ) {
-          this.filterOutSelector += selector
+          this.filterOutSelector += ', ' +  selector
         } else {
           this.filterOutSelector = selector
         }
@@ -112,7 +112,7 @@ Fibre.fn = Fibre.prototype = {
     return it 
   },
 
-  wrap: function( regexp, strElemName ) {
+  wrap: function( regexp, strElemName, portionMode ) {
     var it = this
     var portionMode = portionMode || 'retain'
     it.finder.push(Finder( it.context, {
@@ -120,7 +120,8 @@ Fibre.fn = Fibre.prototype = {
       wrap: strElemName,
       filterElements: function( currentNode ) {
         return it.filterElemFn( currentNode )
-      }
+      },
+      portionMode: portionMode
     }))
     return it
   },
