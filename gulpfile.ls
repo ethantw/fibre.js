@@ -6,7 +6,7 @@ lsc = require \gulp-livescript
 browserify = require \gulp-browserify
 jade = require \gulp-jade
 watch = require \gulp-watch
-mocha = require \gulp-mocha
+qunit = require \gulp-qunit
 pkg = require \./package.json
 
 const VERSION = pkg.version
@@ -57,7 +57,12 @@ gulp.task \compile:dep !->
     }
     .pipe gulp.dest \./src/
 
-gulp.task \test !->
+
+gulp.task \test ->
+  return gulp.src \./test/index.html
+    .pipe qunit!
+
+gulp.task \test:demo !->
   src \test/*.ls
     .pipe lsc!
     .pipe browserify!
@@ -66,7 +71,7 @@ gulp.task \test !->
     .pipe jade { +pretty }
     .pipe gulp.dest \./test/
 
-gulp.task \watch <[ test ]> !->
+gulp.task \watch <[ test:demo ]> !->
   gulp.watch \src/*.js <[ build ]>
 gulp.task \dep <[ compile:dep ]>
 gulp.task \default <[ server build watch ]>

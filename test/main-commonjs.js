@@ -3505,7 +3505,6 @@ if (typeof define==='function'&&define.amd){define(function(){return exposed});}
   var test, module, doc, div, convertHtml, htmlEqual;
   test = QUnit.test;
   module = QUnit.module;
-  window.Fibre = Fibre;
   doc = function(){
     return document.cloneNode(true);
   };

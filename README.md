@@ -34,6 +34,10 @@ var fibre = Fibre( document.body )
 …
 ```
 
+## Run test
+- Install dependencies `sudo npm i`
+- Run test `gulp test`
+
 ## Browser support
 Fibre.js works on all *modern* browsers with no legacy support for older IE.
 
