@@ -1,5 +1,5 @@
 /*!
- * Fibre.js v0.1.0 | MIT License | github.com/ethantw/fibre.js
+ * Fibre.js v0.1.2 | MIT License | github.com/ethantw/fibre.js
  * Based on findAndReplaceDOMText
  */
 
@@ -9,7 +9,7 @@ void function( Finder ) {
 
 var Finder = Finder || require( './finder.umd' )
 
-var VERSION = '0.1.0'
+var VERSION = '0.1.2'
 var FILTER_OUT_SELECTOR = 'style, script, head title'
 
 var global = window || {}
