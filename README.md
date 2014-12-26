@@ -86,7 +86,7 @@ The method wraps an assigned node round the matched text in the given context.
 
 ### Syntax
 ```javascript
-fibre.wrap( regexp|substr, strElemName|node )
+fibre.wrap( regexp|substr, strElemName|node[, portionMode] )
 ```
 ### Parametres
 
@@ -102,6 +102,9 @@ fibre.wrap( regexp|substr, strElemName|node )
 
 <dt><code>node</code>
 <dd>A node that is to be cloned for each match portion. 
+
+<dt><code>portionMode</code>
+<dd><em>Optional</em>. String of either one of <code>'retain'</code> or <code>'first'</code>, which indicates whether to re-use the existing node boundaries when wrapping a match text, or simply place the entire replacement in the first-found match portion's node. The default value is <code>'retain'</code>.
 </dl>
 
 ### Examples
