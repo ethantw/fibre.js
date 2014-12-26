@@ -6,6 +6,7 @@ lsc = require \gulp-livescript
 browserify = require \gulp-browserify
 jade = require \gulp-jade
 watch = require \gulp-watch
+mocha = require \gulp-mocha
 pkg = require \./package.json
 
 const VERSION = pkg.version
@@ -52,7 +53,7 @@ gulp.task \compile:dep !->
       process: ( src ) ->
         src
           .replace 'window.findAndReplaceDOMText =' \void
-          .replace ' return exposed;' EXPOSED
+          .replace '\treturn exposed;' EXPOSED
     }
     .pipe gulp.dest \./src/
 
