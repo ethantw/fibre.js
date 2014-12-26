@@ -58,7 +58,7 @@ gulp.task \compile:dep !->
     .pipe gulp.dest \./src/
 
 gulp.task \test !->
-  src \test/main.ls
+  src \test/*.ls
     .pipe lsc!
     .pipe browserify!
     .pipe gulp.dest \./test/

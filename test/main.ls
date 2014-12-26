@@ -1,10 +1,6 @@
 
-Fibre = require \../src/fibre
-qunit = require \qunitjs
-
-test = qunit.test
-module = qunit.module
-window.Fibre = Fibre  # For browser-side console
+test = QUnit.test
+module = QUnit.module
 
 doc = -> document.cloneNode true
 div = -> document.createElement \div
