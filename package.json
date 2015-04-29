@@ -19,5 +19,8 @@
     "gulp-qunit": "^1.1.0",
     "gulp-watch": "^3.0.0",
     "qunitjs": "^1.16.0"
+  },
+  "dependencies": {
+    "findandreplacedomtext": "^0.4.3"
   }
 }
