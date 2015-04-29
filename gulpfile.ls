@@ -10,7 +10,7 @@ qunit = require \gulp-qunit
 pkg = require \./package.json
 
 const VERSION = pkg.version
-const PATH-FINDER = './findAndReplaceDOMText/src/findAndReplaceDOMText.js'
+const PATH-FINDER = './node_modules/findAndReplaceDOMText/src/findAndReplaceDOMText.js'
 const EXPOSED = '// EXPOSE\nif (typeof define===\'function\'&&define.amd){define(function(){return exposed});}else if(typeof module!==\'undefined\'&&module.exports){module.exports=exposed;}else{window.findAndReplaceDOMText = exposed;}\n// EXPOSE'
 
 src = -> gulp.src( it ).pipe( watch( it ))
