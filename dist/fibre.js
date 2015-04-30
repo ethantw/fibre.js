@@ -1,5 +1,5 @@
 /*!
- * Fibre.js v0.1.2 | MIT License | github.com/ethantw/fibre.js
+ * Fibre.js v0.2.0 | MIT License | github.com/ethantw/fibre.js
  * Based on findAndReplaceDOMText
  */
 
@@ -9,7 +9,7 @@ void function( Finder ) {
 
 var Finder = Finder || require( './finder.umd' )
 
-var VERSION = '0.1.2'
+var VERSION = '0.2.0'
 var NON_INLINE_PROSE = Finder.NON_INLINE_PROSE
 var AVOID_NON_PROSE = Finder.PRESETS.prose.filterElements
 
