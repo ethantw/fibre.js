@@ -1,6 +1,6 @@
 {
   "name": "fibre.js",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "String-like DOM text manipulator",
   "main": "src/fibre.js",
   "scripts": {
