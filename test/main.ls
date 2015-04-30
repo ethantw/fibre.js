@@ -141,7 +141,7 @@ test 'Default filtering' !->
     .replace r, \TE$1T
   html-equal d.innerHTML, 'This <b class="be">is</b> a <x>TExT</x> run for the <x>TEsT</x>.   <style>.test{}</style>  <script>test()</script>'
 
-test 'Filter nodes with custom CSS selectors' !->
+test 'Filter nodes with given selectors' !->
   before = '<b>test</b>, <i>test</i>, <u>test</u>'
   d = div!
 
@@ -152,14 +152,47 @@ test 'Filter nodes with custom CSS selectors' !->
 
   html-equal d.innerHTML, '<b><x>test</x></b>, <i><x>test</x></i>, <u>test</u>'
 
+test 'End filtering' !->
+  before = '<b>test</b>, <i>test</i>, <u>test</u>'
+  d = div!
+
+  d.innerHTML = before
+  Fibre d
+    .filter 'div, b, i'
+      .wrap /test/g, \x
+    .endFilter!
+    .wrap /test/g, \y
+  html-equal d.innerHTML, '<b><x><y>test</y></x></b>, <i><x><y>test</y></x></i>, <u><y>test</y></u>'
+
+  d.innerHTML = before
+  f = Fibre d
+    .filter 'div, b'
+    .filter \i
+      .wrap /test/g, \x
+    .endFilter!
+    .filter \x
+      .wrap /test/g, \y
+  html-equal d.innerHTML, '<b><x><y>test</y></x></b>, <i><x>test</x></i>, <u>test</u>'
+
+  d.innerHTML = before
+  f = Fibre d
+    .filter 'div, b'
+    .filter \i
+      .wrap /test/g, \x
+    .endFilter!
+    .filter \x
+      .wrap /test/g, \y
+    .endFilter true
+      .wrap /test/g, \z
+  html-equal d.innerHTML, '<b><x><y><z>test</z></y></x></b>, <i><x><z>test</z></x></i>, <u><z>test</z></u>'
+
 test 'Avoid given selectors' !->
   before = 'This <b class="be">is</b> a text run for the test.   <style>.is{}</style>  <script>is()</script>'
   d = div!
   r = /is/gi
 
   d.innerHTML = before
-  fibre = Fibre d
-  fibre
+  Fibre d
     .wrap r, \x
     .avoid \.be
     .wrap r, \y
@@ -168,12 +201,33 @@ test 'Avoid given selectors' !->
   before = 'This <b class="be">is</b> a text run for the test.   <style>.is{}</style>  <script>is()</script>'
   d = div!
   d.innerHTML = before
-  fibre = Fibre d, true
-  fibre
+  Fibre d, true
     .wrap r, \x
     .avoid \.be
     .wrap r, \y
   html-equal d.innerHTML, 'th<x><y>is</y></x> <b class=be><x>is</x></b> a text run for the test.   <style>.<x><y>is</y></x>{}</style>  <script><x><y>is</y></x>()</script>'
+
+test 'End avoiding' !->
+  before = '<a>test</a>, <strong>test, </strong> <em>test</em>'
+  d = div!
+
+  d.innerHTML = before
+  Fibre d
+    .avoid \strong
+    .avoid \em
+    .replace /test/gi, \DONE
+    .endAvoid!
+    .replace /test/gi, \DONE-2
+  html-equal d.innerHTML, '<a>done</a>, <strong>test, </strong> <em>done-2</em>'
+
+  d.innerHTML = before
+  Fibre d
+    .avoid \strong
+    .avoid \em
+    .replace /test/gi, \DONE
+    .endAvoid yes
+    .replace /test/gi, \DONE-2
+  html-equal d.innerHTML, '<a>done</a>, <strong>done-2, </strong> <em>done-2</em>'
 
 module \Prose
 test 'Default preset prose' !->
