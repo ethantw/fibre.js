@@ -184,6 +184,10 @@ Fibre.fn = Fibre.prototype = {
   }
 }
 
+// Deprecated API(s)
+Fibre.fn.filterOut = Fibre.fn.avoid
+
+// Make sure init() inherit from Fibre()
 Fibre.fn.init.prototype = Fibre.fn
 
 // EXPOSE
