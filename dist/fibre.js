@@ -10,7 +10,8 @@ void function( Finder ) {
 var Finder = Finder || require( './finder.umd' )
 
 var VERSION = '0.1.2'
-var FILTER_OUT_SELECTOR = 'style, script, head title'
+var NON_INLINE_PROSE = Finder.NON_INLINE_PROSE
+var AVOID_NON_PROSE = Finder.PRESETS.prose.filterElements
 
 var global = window || {}
 var document = global.document || undefined
@@ -29,9 +30,10 @@ function matches( node, selector, bypassNodeType39 ) {
 
 if ( typeof document === 'undefined' )  throw new Error( 'Fibre requires a DOM-supported environment.' )
 
-var Fibre = function( context ) {
-  return new Fibre.fn.init( context )
+var Fibre = function( context, preset ) {
+  return new Fibre.fn.init( context, preset )
 }
+
 
 Fibre.version = VERSION
 Fibre.matches = matches
@@ -41,87 +43,128 @@ Fibre.fn = Fibre.prototype = {
 
   version: VERSION,
 
-  context: undefined,
-
-  contextSelector: null,
-
   finder: [],
 
-  init: function( context ) {
-    if ( !context )  throw new Error( 'A context is required for Fibre to initialise.' ) 
+  context: undefined,
 
-    if ( context instanceof Node ) {
-      this.context = context
-    } else if ( typeof context === 'string' ) {
-      this.contextSelector = context
-      this.context = document.querySelector( context )
+  portionMode: 'retain',
+
+  selector: {},
+
+  preset: 'prose',
+
+  init: function( context, noPreset ) {
+    if ( !!noPreset )  this.preset = null
+
+    this.selector = {
+      context: null,
+      filter: [],
+      avoid: [],
+      boundary: []
     }
 
+    if ( !context ) {
+      throw new Error( 'A context is required for Fibre to initialise.' ) 
+    } else if ( context instanceof Node ) {
+      if ( context instanceof Document )  this.context = context.body || context
+      else  this.context = context
+    } else if ( typeof context === 'string' ) {
+      this.context = document.querySelector( context )
+      this.selector.context = context
+    }
     return this
   },
 
-  filterElemFn: function( currentNode ) {
-    return matches( currentNode, this.filterSelector, true ) &&
-      !matches( currentNode, this.filterOutSelector )
+  filterFn: function( node ) {
+    var filter = this.selector.filter.join( ', ' ) || '*'
+    var avoid  = this.selector.avoid.join( ', ' ) || null
+    var result = matches( node, filter, true ) && !matches( node, avoid )
+    return ( this.preset === 'prose' ) ? AVOID_NON_PROSE( node ) && result : result
   },
 
-  filterSelector: '*',
+  boundaryFn: function( node ) {
+    var boundary = this.selector.boundary.join( ', ' ) || null
+    var result = matches( node, boundary )
+    return ( this.preset === 'prose' ) ? NON_INLINE_PROSE( node ) || result : result
+  },
 
   filter: function( selector ) {
-    switch ( typeof selector ) {
-      case 'string':
-        this.filterSelector = selector
-        break
-      case 'function':
-        this.filterElemFn = selector
-        break
-      default:
-        return this
+    if ( typeof selector === 'string' ) {
+      this.selector.filter.push( selector )
     }
     return this
   },
 
-  filterOutSelector: FILTER_OUT_SELECTOR,
-
-  filterOut: function( selector, boolExtend ) {
-    switch( typeof selector ) {
-      case 'string':
-        if ( typeof boolExtend !== 'undefined' && boolExtend === true ) {
-          this.filterOutSelector += ', ' +  selector
-        } else {
-          this.filterOutSelector = selector
-        }
-        break
-      default:
-        return this
+  endFilter: function( all ) {
+    if ( all ) {
+      this.selector.filter = []
+    } else {
+      this.selector.filter.pop()
     }
     return this
   },
 
-  replace: function( regexp, newSubStr, portionMode ) {
+  avoid: function( selector ) {
+    if ( typeof selector === 'string' ) {
+      this.selector.avoid.push( selector )
+    }
+    return this
+  },
+
+  endAvoid: function( all ) {
+    if ( all ) {
+      this.selector.avoid = []
+    } else {
+      this.selector.avoid.pop()
+    }
+    return this
+  },
+
+  addBoundary: function( selector ) {
+    if ( typeof selector === 'string' ) {
+      this.selector.boundary.push( selector )
+    }
+    return this
+  },
+
+  removeBoundary: function() {
+    this.selector.boundary = []
+    return this
+  },
+
+  setMode: function( portionMode ) {
+    this.portionMode = portionMode === 'first' ? 'first' : 'retain'
+    return this
+  },
+
+  replace: function( regexp, newSubStr ) {
     var it = this
-    var portionMode = portionMode || 'retain'
     it.finder.push(Finder( it.context, {
       find: regexp, 
       replace: newSubStr,
       filterElements: function( currentNode ) {
-        return it.filterElemFn( currentNode )
+        return it.filterFn( currentNode )
       }, 
-      portionMode: portionMode
+      forceContext: function( currentNode ) {
+        return it.boundaryFn( currentNode )
+      },
+      portionMode: it.portionMode
     }))
     return it 
   },
 
-  wrap: function( regexp, strElemName, portionMode ) {
+  wrap: function( regexp, strElemName ) {
     var it = this
-    var portionMode = portionMode || 'retain'
     it.finder.push(Finder( it.context, {
       find: regexp, 
       wrap: strElemName,
       filterElements: function( currentNode ) {
-        return it.filterElemFn( currentNode )
+        return it.filterFn( currentNode )
       },
-      portionMode: portionMode
+      forceContext: function( currentNode ) {
+        return it.boundaryFn( currentNode )
+      },
+      portionMode: it.portionMode
     }))
     return it
   },

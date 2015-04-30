@@ -140,7 +140,7 @@
     fibre.wrap(r, 'x').replace(r, 'TE$1T');
     htmlEqual(d.innerHTML, 'This <b class="be">is</b> a <x>TExT</x> run for the <x>TEsT</x>.   <style>.test{}</style>  <script>test()</script>');
   });
-  test('Filtering nodes with custom CSS selectors', function(){
+  test('Filter nodes with custom CSS selectors', function(){
     var before, d;
     before = '<b>test</b>, <i>test</i>, <u>test</u>';
     d = div();
@@ -148,31 +148,61 @@
     Fibre(d).filter('div, b, i').wrap(/test/g, 'x');
     htmlEqual(d.innerHTML, '<b><x>test</x></b>, <i><x>test</x></i>, <u>test</u>');
   });
-  test('Filtering out with extended selectors', function(){
+  test('Avoid given selectors', function(){
     var before, d, r, fibre;
     before = 'This <b class="be">is</b> a text run for the test.   <style>.is{}</style>  <script>is()</script>';
     d = div();
     r = /is/gi;
     d.innerHTML = before;
     fibre = Fibre(d);
-    fibre.wrap(r, 'x').filterOut('.be').wrap(r, 'y');
-    htmlEqual(d.innerHTML, 'Th<x><y>is</y></x> <b class="be"><x>is</x></b> a text run for the test.   <style>.<y>is</y>{}</style>  <script><y>is</y>()</script>');
-    d.innerHTML = before;
-    fibre = Fibre(d);
-    fibre.wrap(r, 'x').filterOut('.be', true).wrap(r, 'y');
-    htmlEqual(d.innerHTML, 'Th<x><y>is</y></x> <b class="be"><x>is</x></b> a text run for the test.   <style>.is{}</style>  <script>is()</script>');
-  });
-  test('Custom filtering function', function(){
-    var before, d, r, fibre;
-    before = '<p>This <b class="be">is</b> a text run for <b><i>the</i></b> <b>test</b>.';
+    fibre.wrap(r, 'x').avoid('.be').wrap(r, 'y');
+    htmlEqual(d.innerHTML, 'th<x><y>is</y></x> <b class=be><x>is</x></b> a text run for the test.   <style>.is{}</style>  <script>is()</script>');
+    before = 'This <b class="be">is</b> a text run for the test.   <style>.is{}</style>  <script>is()</script>';
     d = div();
-    r = /\b(\w+)\b/g;
     d.innerHTML = before;
-    fibre = Fibre(d);
-    fibre.filter(function(currentNode){
-      return !/^(is|the)$/i.test(currentNode.textContent);
-    }).wrap(r, 'y');
-    htmlEqual(d.innerHTML, '<p><y>This</y> <b class="be">is</b> <y>a</y> <y>text</y> <y>run</y> <y>for</y> <b><i>the</i></b> <b><y>test</y></b>.</p>');
+    fibre = Fibre(d, true);
+    fibre.wrap(r, 'x').avoid('.be').wrap(r, 'y');
+    htmlEqual(d.innerHTML, 'th<x><y>is</y></x> <b class=be><x>is</x></b> a text run for the test.   <style>.<x><y>is</y></x>{}</style>  <script><x><y>is</y></x>()</script>');
+  });
+  module('Prose');
+  test('Default preset prose', function(){
+    var before, d;
+    before = '<p>Some</p><p>Thing.</p><p>Something. Some<b>th</b>ing.</p><div>Some</div><div>Thing! Something</div>';
+    d = div();
+    d.innerHTML = before;
+    Fibre(d).replace(/\bsomething\b/gi, 'Nothing');
+    htmlEqual(d.innerHTML, '<p>some</p><p>thing.</p><p>nothing. noth<b>in</b>g.</p><div>some</div><div>thing! nothing</div>');
+    d.innerHTML = before;
+    Fibre(d).wrap(/\bsomething\b/gi, 'x');
+    htmlEqual(d.innerHTML, '<p>some</p><p>thing.</p><p><x>something</x>. <x>some</x><b><x>th</x></b><x>ing</x>.</p><div>some</div><div>thing! <x>something</x></div>');
+  });
+  test('Add boundaries', function(){
+    var before, d;
+    before = '<p>Some</p><p>Thing.</p><p>Something. Some<b>th</b>ing.</p><div>Some</div><div>Thing! Something</div><nav><b>Some</b><custom-p>Thing.</custom-p><custom-a>Something.</custom-a><custom-a>Some</custom-a><custom-a>thing</custom-a></nav>';
+    d = div();
+    d.innerHTML = before;
+    Fibre(d).wrap(/\bsomething\b/gi, 'x');
+    htmlEqual(d.innerHTML, '<p>some</p><p>thing.</p><p><x>something</x>. <x>some</x><b><x>th</x></b><x>ing</x>.</p><div>some</div><div>thing! <x>something</x></div><nav><b><x>some</x></b><custom-p><x>thing</x>.</custom-p><custom-a><x>something</x>.</custom-a><custom-a><x>some</x></custom-a><custom-a><x>thing</x></custom-a></nav>');
+    d.innerHTML = before;
+    Fibre(d).addBoundary('custom-p, custom-a').wrap(/\bsomething\b/gi, 'x');
+    htmlEqual(d.innerHTML, '<p>some</p><p>thing.</p><p><x>something</x>. <x>some</x><b><x>th</x></b><x>ing</x>.</p><div>some</div><div>thing! <x>something</x></div><nav><b>some</b><custom-p>thing.</custom-p><custom-a><x>something</x>.</custom-a><custom-a>some</custom-a><custom-a>thing</custom-a></nav>');
+    d.innerHTML = before;
+    Fibre(d, true).addBoundary('custom-p, custom-a').wrap(/\bsomething\b/gi, 'x');
+    htmlEqual(d.innerHTML, '<p><x>some</x></p><p><x>thing</x>.</p><p><x>something</x>. <x>some</x><b><x>th</x></b><x>ing</x>.</p><div><x>some</x></div><div><x>thing</x>! something</div><nav><b>some</b><custom-p>thing.</custom-p><custom-a><x>something</x>.</custom-a><custom-a>some</custom-a><custom-a>thing</custom-a></nav>');
+    d.innerHTML = before;
+    Fibre(d).addBoundary('custom-p').addBoundary('custom-a').wrap(/\bsomething\b/gi, 'x');
+    htmlEqual(d.innerHTML, '<p>some</p><p>thing.</p><p><x>something</x>. <x>some</x><b><x>th</x></b><x>ing</x>.</p><div>some</div><div>thing! <x>something</x></div><nav><b>some</b><custom-p>thing.</custom-p><custom-a><x>something</x>.</custom-a><custom-a>some</custom-a><custom-a>thing</custom-a></nav>');
+    d.innerHTML = before;
+    Fibre(d, true).addBoundary('custom-p').addBoundary('custom-a').wrap(/\bsomething\b/gi, 'x');
+    htmlEqual(d.innerHTML, '<p><x>some</x></p><p><x>thing</x>.</p><p><x>something</x>. <x>some</x><b><x>th</x></b><x>ing</x>.</p><div><x>some</x></div><div><x>thing</x>! something</div><nav><b>some</b><custom-p>thing.</custom-p><custom-a><x>something</x>.</custom-a><custom-a>some</custom-a><custom-a>thing</custom-a></nav>');
+  });
+  test('Remove boundaries', function(){
+    var before, d;
+    before = '<p>Some</p><p>Thing.</p><p>Something. Some<b>th</b>ing.</p><div>Some</div><div>Thing! Something</div><nav><b>Some</b><custom-p>Thing.</custom-p><custom-a>Something.</custom-a><custom-a>Some</custom-a><custom-a>thing</custom-a></nav>';
+    d = div();
+    d.innerHTML = before;
+    Fibre(d).addBoundary('custom-p, custom-a').wrap(/\bsomething\b/gi, 'x').removeBoundary().wrap(/\bsomething\b/gi, 'y');
+    htmlEqual(d.innerHTML, '<p>some</p><p>thing.</p><p><x><y>something</y></x>. <x><y>some</y></x><b><x><y>th</y></x></b><x><y>ing</y></x>.</p><div>some</div><div>thing! <x><y>something</y></x></div><nav><b><y>some</y></b><custom-p><y>thing</y>.</custom-p><custom-a><x><y>something</y></x>.</custom-a><custom-a><y>some</y></custom-a><custom-a><y>thing</y></custom-a></nav>');
   });
   module('Revert');
   test('Revert mechanism', function(){
@@ -197,10 +227,10 @@
     before = 'Testing 123 HE<em>LLO there</em>';
     d = div();
     d.innerHTML = before;
-    Fibre(d).wrap(/hello/i, 'span', 'first');
+    Fibre(d).setMode('first').wrap(/hello/i, 'span');
     htmlEqual(d.innerHTML, 'Testing 123 <span>HELLO</span><em> there</em>', 'Wrap');
     d.innerHTML = before;
-    Fibre(d).replace(/hello/i, 'hola', 'first');
+    Fibre(d).setMode('first').replace(/hello/i, 'hola');
     htmlEqual(d.innerHTML, 'Testing 123 hola<em> there</em>', 'Replace');
   });
   test('Portion mode: retain', function(){
@@ -208,11 +238,28 @@
     before = 'Testing 123 HE<em>LLO there</em>';
     d = div();
     d.innerHTML = before;
-    fibre = Fibre(d).wrap(/hello/i, 'span', 'retain');
+    fibre = Fibre(d).setMode('retain').wrap(/hello/i, 'span');
     htmlEqual(d.innerHTML, 'testing 123 <span>he</span><em><span>llo</span> there</em>', 'Wrap');
     d.innerHTML = before;
-    Fibre(d).replace(/hello/i, 'hola', 'retain');
+    Fibre(d).setMode('retain').replace(/hello/i, 'hola');
     htmlEqual(d.innerHTML, 'Testing 123 ho<em>la there</em>', 'Replace');
+  });
+  module('Presets');
+  test('Prose (by default)', function(){
+    var before, d, x;
+    before = '<p>Some</p>Thing!<em>Something</em><strong>Some</strong>Thing<span>Some</span><div>Thing</div><article>something</article><style>something</style>';
+    d = div();
+    d.innerHTML = before;
+    x = Fibre(d).wrap(/something/ig, 'x');
+    htmlEqual(d.innerHTML, '<p>some</p>thing!<em><x>something</x></em><strong><x>some</x></strong><x>thing</x><span>some</span><div>thing</div><article><x>something</x></article><style>something</style>');
+  });
+  test('No preset', function(){
+    var before, d, x;
+    before = '<p>Some</p>Thing!<em>Something</em><strong>Some</strong>Thing<span>Some</span><div>Thing</div><style>something</style>';
+    d = div();
+    d.innerHTML = before;
+    x = Fibre(d, true).wrap(/something/ig, 'x');
+    htmlEqual(d.innerHTML, '<p><x>some</x></p><x>thing</x>!<em><x>something</x></em><strong><x>some</x></strong><x>thing</x><span><x>some</x></span><div><x>thing</x></div><style><x>something</x></style>');
   });
 }).call(this);
 
