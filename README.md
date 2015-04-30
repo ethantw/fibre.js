@@ -2,7 +2,7 @@
 # Fibre.js
 Fibre.js is a small library based on [`FindAndReplaceDOMText`][fardt] by [James Padolsey][jp].
 
-The methods provided by Fibre search for the regular expression matches in a given context (a DOM node) and replaces/wraps each one of them with a new text run or a new DOM node. 
+The method collections of Fibre.js help search for the regular expression matches in a given context (a DOM node) and replace/wrap each one of them with a new text run or a new DOM node. 
 
 *Chaining & string-like syntax supported.*
 
@@ -11,7 +11,6 @@ The methods provided by Fibre search for the regular expression matches in a giv
 
 ## Install
 - NPM `npm i fibre.js --save`
-- Bower `bower install git://github.com/ethantw/fibre.js`
 
 ### Require the library
 Use the `script` element,
@@ -46,14 +45,23 @@ Fibre.js is released under MIT License.
 
 * * *
 
+<!-- ################################################ -->
+
 # API
 - [Introduction](#introduction)
 - [Fibre.fn.wrap()](#fibrefnwrap)
 - [Fibre.fn.replace()](#fibrefnreplace)
+- [Fibre.fn.setMode()](#fibrefnsetmode)
+- [Fibre.fn.addBoundary()](#fibrefnaddboundary)
+- [Fibre.fn.removeBoundary()](#fibrefnremoveboundary)
+- [Fibre.fn.avoid()](#fibrefnavoid)
+- [Fibre.fn.endAvoid()](#fibrefnendavoid)
 - [Fibre.fn.filter()](#fibrefnfilter)
-- [Fibre.fn.filterOut()](#fibrefnfilterout)
+- [Fibre.fn.endFilter()](#fibrefnendfilter)
 - [Fibre.fn.revert()](#fibrefnrevert)
 - [Fibre.matches()](#fibrematches)
+
+<!-- ################################################ -->
 
 ## Introduction 
 The syntax is *as simple as jQuery!*
@@ -62,12 +70,15 @@ The syntax is *as simple as jQuery!*
 
 ### Syntax
 ```javascript
-var fibre = Fibre( context )
+var fibre = Fibre( context, noPreset )
 
 fibre
   .replace( … )
   .wrap( … )
 ```
+
+### The `noPreset` switch
+By default, Fibre ignores elements like `style`, `script`, `img`, etc and considers elements like `div`, `p`, `h1`, etc the boundaries of text. Set the second parametre `noPreset` to `true` to turn off such configuration.
 
 ### Examples
 ```javascript
@@ -81,12 +92,14 @@ Fibre( $( '.container article' )[0] )
 Fibre( '.container article' )
 ```
 
+<!-- ################################################ -->
+
 ## Fibre.fn.wrap()
 The method wraps an assigned node round the matched text in the given context.
 
 ### Syntax
 ```javascript
-fibre.wrap( regexp|substr, strElemName|node[, portionMode] )
+fibre.wrap( regexp|substr, strElemName|node )
 ```
 ### Parametres
 
@@ -102,9 +115,6 @@ fibre.wrap( regexp|substr, strElemName|node[, portionMode] )
 
 <dt><code>node</code>
 <dd>A node that is to be cloned for each match portion. 
-
-<dt><code>portionMode</code>
-<dd><em>Optional</em>. String of either one of <code>'retain'</code> or <code>'first'</code>, which indicates whether to re-use the existing node boundaries when wrapping a match text, or simply place the entire replacement in the first-found match portion's node. The default value is <code>'retain'</code>.
 </dl>
 
 ### Examples
@@ -139,12 +149,14 @@ Results in:
 </body>
 ```
 
+<!-- ################################################ -->
+
 ## Fibre.fn.replace()
 The method replaces the matched text in the given context with a new string.
 
 ### Syntax
 ```javascript
-fibre.replace( regexp|substr, newSubStr|function[, portionMode] )
+fibre.replace( regexp|substr, newSubStr|function )
 ```
 
 ### Parametres
@@ -161,9 +173,6 @@ fibre.replace( regexp|substr, newSubStr|function[, portionMode] )
 
 <dt><code>function</code>
 <dd>A callback function to be invoked and returns the new substring or node.
-
-<dt><code>portionMode</code>
-<dd><em>Optional</em>. String of either one of <code>'retain'</code> or <code>'first'</code>, which indicates whether to re-use the existing node boundaries when replacing a match text, or simply place the entire replacement in the first-found match portion's node. The default value is <code>'retain'</code>.
 </dl>
 
 ### Examples 
@@ -192,69 +201,94 @@ Will result in:
 </article>
 ```
 
-## Fibre.fn.filter()
-The method filters the nodes in the given context and decides whether the nodes *will* later apply the wrap/replace method.
+<!-- ################################################ -->
+
+## Fibre.fn.setMode()
+The method sets the portion mode of the instance.
 
 ### Syntax
 ```javascript
-fibre.filter( selector|function )
+fibre.setMode( portionMode )
+```
+
+### Parametres
+<dl>
+<dt><code>portionMode</code>
+<dd>A String of either `'retain'` or `'first'`, which indicates whether to re-use the existing node boundaries when wrapping a match text, or simply place the entire replacement in the first-found match portion's node. The default value is `'retain'`.
+</dl>
+
+<!-- ################################################ -->
+
+## Fibre.fn.addBoundary()
+The method adds text boundary(ies) to avoids their cross-node matching and replacing.
+
+### Syntax
+```javascript
+fibre.addBoundary( selector )
 ```
 
 ### Parametres
 <dl>
 <dt><code>selector</code>
-<dd>A String containing one or more CSS selector(s) to filter the matched nodes while traversing.
-
-<dt><code>function</code>
-<dd>A function that will be invoked on every match, which receives one parametre <code>currentNode</code> indicating the node the matched text is for filtering usage. By assigning a function to the parametre #1 affects the <code>filterOut()</code> method as well.
+<dd>A String containing one or more CSS selector(s) to be added as text boundaries.
 </dl>
 
 ### Examples
 ```html
 <div id="test">
-  <p>This <span class="be">is</span> a simple test.</p>
+  <p>Something</p>
+  <p>Some</p><blockquote>Thing</blockquote>
+  <a>Something</a>
+  <a>Some</a><a class="block">Thing</a>
 </div>
-
-<script>
- var test = 'This is a simple test.' 
-</script>
 ```
 
 ```javascript
 Fibre( document.getElementById( 'test' ))
-  .wrap( /is/gi, 'b' )
-  .filter( '.be' )
-  .wrap( /is/gi, 'em' ) 
+  .wrap( /something/gi, 'span' )
+  .addBoundary( 'a.block' )
+  .wrap( /something/gi, 'b' )
 ```
 
 Will result in:
 
 ```html
 <div id="test">
-  <p>Th<b>is</b> <span class="be"><b><em>is</em></b></span> a simple test.</p>
+  <p><span><b>Something</b></span></p>
+  <p>Some</p><blockquote>Thing</blockquote>
+  <a><span><b>Something</b></span></a>
+  <a><span>Some</span></a><a class="block"><span>Thing</span></a>
 </div>
-
-<script>
- var test = 'This is a simple test.' 
-</script>
 ```
-**Note:** The matched text inside `script` element isn't altered for Fibre defaultly filters out `script`, `style` and `head title` elements. Reset the default filter-out selectors via `Fibre.fn.filterOut`.
 
-## Fibre.fn.filterOut()
-The method filters *out* the nodes in the given context and decides whether the nodes *will* later apply the wrap/replace method.
+<!-- ################################################ -->
+
+## Fibre.fn.removeBoundary()
+The methods removes *all* custom text boundaries of the instance.
 
 ### Syntax
 ```javascript
-fibre.filterOut( selector, boolExtend )
+fibre.removeBoundary()
+```
+
+**Note:** The preset configurations will not be removed by the use of the method.
+
+<!-- ################################################ -->
+
+## Fibre.fn.avoid()
+The method avoids the nodes matching the given selector which will later not apply the wrap/replace method.
+
+**Note:** An older name of the method `filterOut()` is deprecated since v0.2.0. Will be removed in the next major update.
+
+### Syntax
+```javascript
+fibre.avoid( selector )
 ```
 
 ### Parametres
 <dl>
 <dt><code>selector</code>
-<dd>A String containing one or more CSS selector(s) to filter <em>out</em> the matched nodes while traversing.
-
-<dt><code>boolExtend</code>
-<dd><em>Optional.</em> A boolean indicating whether to extend the current selector (<code>true</code>, <code>style, script, head title</code> from the prototype object) or to override the selector entirely (<code>false</code>). Defaultly <code>false</code>.
+<dd>A String containing one or more CSS selector(s) to avoid the matched nodes while traversing.
 </dl>
 
 ### Examples
@@ -271,11 +305,12 @@ fibre.filterOut( selector, boolExtend )
 ```javascript
 Fibre( document.getElementById( 'test' ))
   .wrap( /is/gi, 'span' )
-  .filterOut( '.be' )
+  .avoid( '.be' )
   .replace( /is/gi, 'IZZ' ) 
 ```
 
 Will result in:
+
 ```html
 <div id="test">
   <p>Th<b>IZZ</b> <span class="be"><b>is</b></span> a simple test.</p>
@@ -285,6 +320,91 @@ Will result in:
  var test = 'ThIZZ IZZ a simple test.' 
 </script>
 ```
+
+<!-- ################################################ -->
+
+## Fibre.fn.endAvoid()
+The method ends the avoiding and pops back to previous state of the context.
+
+### Syntax
+```javascript
+fibre.endAvoid( all )
+```
+
+### Parametres
+<dl>
+<dt><code>all</code>
+<dd>*Optional.* A Boolean that decides whether to reset all the avoiding conditions or just one level.
+</dl>
+
+**Note:** The preset configurations will not be reset by the use of the method.
+
+<!-- ################################################ -->
+
+## Fibre.fn.filter()
+The method filters the nodes matching the given selector which will later apply the wrap/replace method.
+
+### Syntax
+```javascript
+fibre.filter( selector )
+```
+
+### Parametres
+<dl>
+<dt><code>selector</code>
+<dd>A String containing one or more CSS selector(s) to filter the matched nodes while traversing.
+</dl>
+
+### Examples
+```html
+<div id="test">
+  <p>This <span class="be">is</span> a simple test.</p>
+</div>
+
+<script>
+ var test = 'This is a simple test.' 
+</script>
+```
+
+```javascript
+Fibre( document.getElementById( 'test' ))
+  .wrap( /is/gi, 'b' )
+  .filter( '.be b' )
+  .wrap( /is/gi, 'em' ) 
+```
+
+Will result in:
+
+```html
+<div id="test">
+  <p>Th<b>is</b> <span class="be"><b><em>is</em></b></span> a simple test.</p>
+</div>
+
+<script>
+ var test = 'This is a simple test.' 
+</script>
+```
+**Note:** The matched text inside `script` element isn't altered for Fibre avoids `script`, `style`, etc by default.
+
+<!-- ################################################ -->
+
+## Fibre.fn.endFilter()
+The method ends the filtering and pops back to previous state of the context.
+
+### Syntax
+```javascript
+fibre.endFilter( all )
+```
+
+### Parametres
+<dl>
+<dt><code>all</code>
+<dd>*Optional.* A Boolean that decides whether to reset all the filtering conditions or just one level.
+</dl>
+
+**Note:** The preset configurations will not be reset by the use of the method.
+
+<!-- ################################################ -->
 
 ## Fibre.fn.revert()
 The method reverts the finder by a given level.
@@ -312,6 +432,8 @@ fibre.revert( 'all' )
 
 #### Description
 The last line of the script above will revert the context (`document.getElementById( 'test' )`) back to the state before any replace or wrap method has executed.
+
+<!-- ################################################ -->
 
 ## Fibre.matches()
 The method compares and returns whether a given node matches the given CSS selectors.
